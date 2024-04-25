@@ -28,6 +28,13 @@
                         />
                     </div>
                 </div>
+        <div class="flex justify-center">
+            <div class="mb-4 w-[500px]">   
+                <ElInput
+                  v-model="addId"
+                  placeholder="請輸入ID"
+                  clearable
+                />
             </div>
             <ElButton
                 v-if="!adminPending"
@@ -49,6 +56,13 @@
                         />
                     </div>
                 </div>
+        <div class="flex justify-center">
+            <div class="mb-4 w-[500px]">   
+                <ElInput
+                  v-model="addId"
+                  placeholder="請輸入ID"
+                  clearable
+                />
             </div>
            <ElButton
                 v-if="!adminPending"

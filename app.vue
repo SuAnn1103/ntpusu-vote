@@ -449,15 +449,3 @@ onBeforeMount(() => {
 }
 </style>
 
-<style scoped>
-.dropdown-menu{
-    position: relative;
-}
-
-.dropdown-menu .el-menu{
-    position:absolute;
-    top: 100%;
-    left: 0;
-    width: 100%; 
-}
-</style>
