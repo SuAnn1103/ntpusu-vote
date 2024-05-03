@@ -93,7 +93,7 @@
           v-if="show"
           class="fixed bottom-0 left-0 right-0 top-[3.3rem] z-40 bg-gray-500 bg-opacity-40"
         />
-        <Transition name="el-zoom-in-top">
+        <Transition name="menu">
           <div
             v-if="show"
             class="absolute bottom-0 right-0 top-[3.3rem] z-50 w-40"
@@ -589,5 +589,18 @@ onBeforeMount(() => {
 .page-enter-from,
 .page-leave-to {
   @apply opacity-0 blur;
+}
+
+.menu-leave-active,
+.menu-enter-active {
+  transition: all .5s ease;
+}
+
+.menu-enter-from {
+  transform: translateX(100%);
+}
+
+.menu-leave-to {
+  transform: translateX(100%);
 }
 </style>
