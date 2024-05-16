@@ -9,20 +9,20 @@
       >
         <el-step
           title="Step 1"
-          description="管理投票者"
+          description="管理選舉區"
         />
         <el-step
           title="Step 2"
-          description="管理選舉區"
+          description="管理投票者"
         />
       </el-steps>
     </div>
     <div class="content">
-      <template v-if="currentPage === 'editVoter'">
-        <editVoter />
-      </template>
-      <template v-else-if="currentPage === 'editDepartment'">
+      <template v-if="currentPage === 'editDepartment'">
         <editDepatment />
+      </template>
+      <template v-else-if="currentPage === 'editVoter'">
+        <editVoter />
       </template>
     </div>
     <div>
@@ -50,18 +50,18 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import editVoter from "~/pages/admin/editVoter.vue";
 import editDepatment from "~/pages/admin/editDepartment.vue";
+import editVoter from "~/pages/admin/editVoter.vue";
 
 const currentStep = ref(0);
-const steps = ["editVoter", "editDepartment", "editFile"];
-const currentPage = ref("editVoter");
+const steps = ["editDepartment", "editVoter", "editFile"];
+const currentPage = ref("editDepartment");
 
 watch(currentStep, (newStep) => {
   if (newStep === 0) {
-    currentPage.value = "editVoter";
-  } else if (newStep === 1) {
     currentPage.value = "editDepartment";
+  } else if (newStep === 1) {
+    currentPage.value = "editVoter";
   } else if (newStep === 2) {
     currentPage.value = "editFile";
   }

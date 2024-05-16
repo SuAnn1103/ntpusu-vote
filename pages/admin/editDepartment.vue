@@ -89,15 +89,15 @@
       />
     </div>
     <!-- 刪除選區 -->
-    <div class="demo-progress">
+    <!-- <div class="demo-progress">
       <ElText
         v-if="deletingDialogVisible"
         class="mx-1"
         size="large"
         >刪除中...</ElText
-      >
+      > -->
       <!-- 顯示刪除進度條 -->
-      <ElProgress
+      <!-- <ElProgress
         v-if="deletingDialogVisible"
         class="mt-3 w-2/3"
         :percentage="100"
@@ -105,24 +105,24 @@
         :indeterminate="true"
         :duration="1"
       />
-    </div>
+    </div> -->
     <!-- 顯示目前系統內的資料筆數 -->
-    <ElText
+    <!-- <ElText
       v-if="!uploadDialogVisible && !deletingDialogVisible"
       class="mx-1"
       size="large"
       >目前系統內有{{ electorCount }}筆資料</ElText
     >
-    <br>
+    <br> -->
     <!-- 刪除選區 -->
-    <ElButton
+    <!-- <ElButton
       v-if="electorCount != 0"
       id="deleteAllDepartments"
       type="danger"
       @click="deleteGroupData"
       >刪除所有選區</ElButton
     >
-    <br>
+    <br> -->
     <el-tour
       v-model="open"
     >
@@ -150,19 +150,19 @@ definePageMeta({
   title: "管理選舉區",
 });
 
-enum studentIdStatusEnum {
-  noInput,
-  notFound,
-  Found,
-}
+// enum studentIdStatusEnum {
+//   noInput,
+//   notFound,
+//   Found,
+// }
 
 const open = ref(false);
 
 
 const uploadDialogVisible = ref(false);
-const deletingDialogVisible = ref(false);
-const queryInput = ref("");
-const departmentIdStatus = ref(studentIdStatusEnum.noInput);
+// const deletingDialogVisible = ref(false);
+// const queryInput = ref("");
+// const departmentIdStatus = ref(studentIdStatusEnum.noInput);
 const selectUploadMode = ref("");
 
 const activeNames = ref(["1"]);
@@ -232,13 +232,13 @@ const deleteGroupData = async () => {
           ElMessage.error("刪除失敗");
         });
 
-      deletingDialogVisible.value = false;
-    })
-    .catch(() => {
-      ElMessage({
-        type: "info",
-        message: "取消刪除",
-      });
-    });
-};
+//       deletingDialogVisible.value = false;
+//     })
+//     .catch(() => {
+//       ElMessage({
+//         type: "info",
+//         message: "取消刪除",
+//       });
+//     });
+// };
 </script>
