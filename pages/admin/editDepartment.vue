@@ -1,6 +1,13 @@
 <template>
   <div class="flex flex-col items-center">
-    <h1 class="my-5 text-center text-2xl font-bold">管理選舉區</h1>
+    <div class="relative">
+      <h1 class="my-5 text-2xl font-bold inline-block">管理選舉區</h1>
+      <el-button 
+        round
+        class="ml-5 md:ml-10 absolute top-1/2 transform -translate-y-1/2"
+        @click="open = true"
+      >使用說明</el-button>
+    </div>
     <ElCollapse
       v-model="activeNames"
       class="w-5/6 max-w-max rounded-xl border-2 border-blue-300 px-4 py-2"
@@ -47,10 +54,11 @@
     >
       <!-- 上傳按鈕 -->
       <template #trigger>
-        <ElButton type="primary">選擇檔案</ElButton>
+        <ElButton id="uploadFile" type="primary">選擇檔案</ElButton>
       </template>
       <!-- 提交按鈕 -->
       <ElButton
+        id="uploadtoServer"
         class="ml-3"
         type="success"
         @click="submitUpload"
@@ -109,11 +117,29 @@
     <!-- 刪除選區 -->
     <ElButton
       v-if="electorCount != 0"
+      id="deleteAllDepartments"
       type="danger"
       @click="deleteGroupData"
       >刪除所有選區</ElButton
     >
     <br>
+    <el-tour
+      v-model="open"
+    >
+    <el-tour-step
+      :target="'#uploadFile'"
+      title="Upload File"
+      description="Put you files here."
+    />
+    <el-tour-step
+      :target="'#uploadtoServer'"
+      title="Save"
+      description="Save your changes"
+    />
+      <template #indicators="{ current, total }">
+        <span>{{ current + 1 }} / {{ total }}</span>
+      </template>
+    </el-tour>
   </div>
 </template>
 
@@ -129,6 +155,9 @@ enum studentIdStatusEnum {
   notFound,
   Found,
 }
+
+const open = ref(false);
+
 
 const uploadDialogVisible = ref(false);
 const deletingDialogVisible = ref(false);

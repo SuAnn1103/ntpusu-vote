@@ -1,5 +1,15 @@
 <template>
   <div style="text-align: -webkit-center">
+    <div class="flex justify-center items-center">
+    <div class="relative">
+      <h1 class="my-5 text-2xl font-bold inline-block">管理投票者</h1>
+      <el-button 
+        round
+        class="ml-5 md:ml-10 absolute top-1/2 transform -translate-y-1/2"
+        @click="open = true"
+      >使用說明</el-button>
+    </div>
+  </div>
     <ElText
       class="mx-1"
       size="large"
@@ -16,21 +26,22 @@
         :limit="1"
       >
         <template #trigger>
-          <ElButton type="primary">選擇檔案</ElButton>
+          <ElButton id="uploadFile" type="primary">選擇檔案</ElButton>
         </template>
-
         <ElButton
-          class="ml-3"
-          type="success"
-          @click="uploadSubmit"
+        id="uploadtoServer"
+        class="ml-3"
+        type="success"
+        @click="uploadSubmit"
         >
-          上傳至伺服器端
-        </ElButton>
-
-        <template #tip>
-          <div class="el-upload__tip">僅能上傳 .xlsx 文件</div>
-        </template>
-      </ElUpload>
+        上傳至伺服器端
+      </ElButton>
+      
+      <template #tip>
+        <div class="el-upload__tip">僅能上傳 .xlsx 文件</div>
+      </template>
+    </ElUpload>
+      
     </div>
     <ElText
       class="mx-1"
@@ -40,6 +51,7 @@
     <br>
     <br>
     <ElButton
+      id="deleteAllVoters"
       type="danger"
       round
       @click="deleteAllVoterDialogVisible = true"
@@ -68,6 +80,7 @@
     <br>
     <br>
     <ElButton
+      id="changeData"
       plain
       @click="dataChangeDialogVisible = true"
     >
@@ -170,12 +183,41 @@
         </div>
       </template>
     </ElDialog>
+    <el-tour
+      v-model="open"
+    >
+    <el-tour-step
+      :target="'#uploadFile'"
+      title="Upload File"
+      description="Put you files here."
+    />
+    <el-tour-step
+      :target="'#uploadtoServer'"
+      title="Save"
+      description="Save your changes"
+    />
+    <el-tour-step
+      :target="'#deleteAllVoters'"
+      title="Other Actions"
+      description="Click to see other"
+    />
+    <el-tour-step
+      :target="'#changeData'"
+      title="Other Actions"
+      description="Click to see other"
+    />
+      <template #indicators="{ current, total }">
+        <span>{{ current + 1 }} / {{ total }}</span>
+      </template>
+    </el-tour>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { UploadInstance } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
+// import 'element-plus/theme-chalk/el-tour.css'; 
+// import { ElTour } from 'element-plus';
 
 definePageMeta({
   middleware: ["admin"],
@@ -199,6 +241,31 @@ enum FailReason {
   DepartmentNotExist = 2,
   InvalidStudentId = 3,
 }
+
+const open = ref(false);
+
+// const steps = [
+//   {
+//     title: "第一步",
+//     description: "这是第一个引导步骤。",
+//     target: "'#uploadRef'", // 使用 CSS 选择器
+//   },
+//   {
+//     title: "第二步",
+//     description: "这是第二个引导步骤。",
+//     target: "'#uploadtoServer'", // 使用 CSS 选择器
+//   },
+//   {
+//     title: "第三步",
+//     description: "这是第三个引导步骤。",
+//     target: "'#deleteAllVoters'", // 使用 CSS 选择器
+//   },
+//   {
+//     title: "第四步",
+//     description: "这是第四个引导步骤。",
+//     target: "'#changeData'", // 使用 CSS 选择器
+//   },
+// ];
 
 const studentIdStatus = ref(studentIdStatusEnum.noInput);
 
@@ -415,9 +482,7 @@ onMounted(async () => {
 });
 
 const loadAll = async () => {
-  const { data: departments, error } = await useFetch(
-    "/api/department/getAll"
-  );
+  const { data: departments, error } = await useFetch("/api/department/getAll");
   if (error.value) {
     ElMessage.error("獲取系所列表失敗" + errHandle(error));
   }

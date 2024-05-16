@@ -535,6 +535,14 @@ const getAdminMenuItems = () => {
         },
       },
       {
+        index: "/admin/editVoterAndDepartment",
+        text: "管理投票者和選舉區",
+        click: () => {
+          show.value = false;
+          useRouter().push("/admin/editVoterAndDepartment");
+        },
+      },
+      {
         index: "/admin/editVoter",
         text: "管理投票者",
         click: () => {
