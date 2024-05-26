@@ -50,7 +50,7 @@
     >
     <br>
     <br>
-    <ElButton
+    <!-- <ElButton
       id="deleteAllVoters"
       type="danger"
       round
@@ -182,7 +182,7 @@
           </ElButton>
         </div>
       </template>
-    </ElDialog>
+    </ElDialog> -->
     <el-tour
       v-model="open"
     >
@@ -215,7 +215,7 @@
 
 <script setup lang="ts">
 import type { UploadInstance } from "element-plus";
-import { Search } from "@element-plus/icons-vue";
+//import { Search } from "@element-plus/icons-vue";
 // import 'element-plus/theme-chalk/el-tour.css'; 
 // import { ElTour } from 'element-plus';
 
@@ -224,17 +224,17 @@ definePageMeta({
   title: "管理投票者",
 });
 
-const dataChangeDialogVisible = ref(false);
-const deleteAllVoterDialogVisible = ref(false);
-const queryInput = ref("");
-const departmentInput = ref("");
-const queryInputData = ref("");
+// const dataChangeDialogVisible = ref(false);
+// const deleteAllVoterDialogVisible = ref(false);
+// const queryInput = ref("");
+// const departmentInput = ref("");
+// const queryInputData = ref("");
 
-enum studentIdStatusEnum {
-  noInput,
-  notFound,
-  Found,
-}
+// enum studentIdStatusEnum {
+//   noInput,
+//   notFound,
+//   Found,
+// }
 
 enum FailReason {
   DuplicateStudentId = 1,
@@ -244,35 +244,12 @@ enum FailReason {
 
 const open = ref(false);
 
-// const steps = [
-//   {
-//     title: "第一步",
-//     description: "这是第一个引导步骤。",
-//     target: "'#uploadRef'", // 使用 CSS 选择器
-//   },
-//   {
-//     title: "第二步",
-//     description: "这是第二个引导步骤。",
-//     target: "'#uploadtoServer'", // 使用 CSS 选择器
-//   },
-//   {
-//     title: "第三步",
-//     description: "这是第三个引导步骤。",
-//     target: "'#deleteAllVoters'", // 使用 CSS 选择器
-//   },
-//   {
-//     title: "第四步",
-//     description: "这是第四个引导步骤。",
-//     target: "'#changeData'", // 使用 CSS 选择器
-//   },
-// ];
+// const studentIdStatus = ref(studentIdStatusEnum.noInput);
 
-const studentIdStatus = ref(studentIdStatusEnum.noInput);
-
-const voterData: Ref<{
-  id: number;
-  department: string;
-} | null> = ref(null);
+// const voterData: Ref<{
+//   id: number;
+//   department: string;
+// } | null> = ref(null);
 
 const uploadRef = ref<UploadInstance>();
 
@@ -289,8 +266,16 @@ const errHandle = (err: any) => {
   }
 };
 
+const voterCounter = useState('voterCounter', () => 0);
+
 const { data: voterCount, refresh: voterCountRefresh } =
   await useFetch("/api/voter/getCnt");
+
+ watchEffect(() => {
+  if (voterCount.value !== null && voterCount.value !== 0) {
+    voterCounter.value = voterCount.value;
+  }
+});
 
 const uploadFunc = async (item: { file: File }) => {
   const file = item.file;
@@ -350,142 +335,142 @@ const uploadFunc = async (item: { file: File }) => {
   uploadRef.value!.clearFiles();
 };
 
-const queryStudentData = async () => {
-  queryInputData.value = queryInput.value;
-  const { data: res, error } = await useFetch(
-    "/api/voter/getVoterAndDepartment",
-    {
-      query: { voter: parseInt(queryInput.value) },
-    },
-  );
-  if (error.value) {
-    studentIdStatus.value = studentIdStatusEnum.notFound;
-    return;
-  }
-  voterData.value = res.value;
-  studentIdStatus.value = studentIdStatusEnum.Found;
-  departmentInput.value = "";
-};
+// const queryStudentData = async () => {
+//   queryInputData.value = queryInput.value;
+//   const { data: res, error } = await useFetch(
+//     "/api/voter/getVoterAndDepartment",
+//     {
+//       query: { voter: parseInt(queryInput.value) },
+//     },
+//   );
+//   if (error.value) {
+//     studentIdStatus.value = studentIdStatusEnum.notFound;
+//     return;
+//   }
+//   voterData.value = res.value;
+//   studentIdStatus.value = studentIdStatusEnum.Found;
+//   departmentInput.value = "";
+// };
 
-const refreshVoterData = async () => {
-  if (voterData.value) {
-    voterData.value.department = "等待刷新中";
-  }
-  const { data: res, error } = await useFetch(
-    "/api/voter/getVoterAndDepartment",
-    {
-      query: { voter: parseInt(queryInput.value) },
-    },
-  );
-  if (error.value) {
-    studentIdStatus.value = studentIdStatusEnum.notFound;
-    return;
-  }
-  voterData.value = res.value;
-  studentIdStatus.value = studentIdStatusEnum.Found;
-  departmentInput.value = "";
-  voterCountRefresh();
-};
+// const refreshVoterData = async () => {
+//   if (voterData.value) {
+//     voterData.value.department = "等待刷新中";
+//   }
+//   const { data: res, error } = await useFetch(
+//     "/api/voter/getVoterAndDepartment",
+//     {
+//       query: { voter: parseInt(queryInput.value) },
+//     },
+//   );
+//   if (error.value) {
+//     studentIdStatus.value = studentIdStatusEnum.notFound;
+//     return;
+//   }
+//   voterData.value = res.value;
+//   studentIdStatus.value = studentIdStatusEnum.Found;
+//   departmentInput.value = "";
+//   voterCountRefresh();
+// };
 
-const modifyDepartment = async () => {
-  const { error } = await useFetch("/api/voter/update", {
-    method: "POST",
-    body: {
-      voterId: parseInt(queryInputData.value),
-      voterDepartment: departmentInput.value,
-    },
-  });
-  if (error.value) {
-    ElMessage.error("修改失敗" + errHandle(error));
-  } else {
-    ElMessage.success("修改成功");
-  }
-  refreshVoterData();
-};
+// const modifyDepartment = async () => {
+//   const { error } = await useFetch("/api/voter/update", {
+//     method: "POST",
+//     body: {
+//       voterId: parseInt(queryInputData.value),
+//       voterDepartment: departmentInput.value,
+//     },
+//   });
+//   if (error.value) {
+//     ElMessage.error("修改失敗" + errHandle(error));
+//   } else {
+//     ElMessage.success("修改成功");
+//   }
+//   refreshVoterData();
+// };
 
-const deleteAllVoter = async () => {
-  const { error } = await useFetch("/api/voter/delAll", {
-    method: "DELETE",
-  });
-  deleteAllVoterDialogVisible.value = false;
-  voterCountRefresh();
-  if (error.value) {
-    ElMessage.error("刪除失敗" + errHandle(error));
-  } else {
-    ElMessage.success("刪除成功");
-  }
-};
+// const deleteAllVoter = async () => {
+//   const { error } = await useFetch("/api/voter/delAll", {
+//     method: "DELETE",
+//   });
+//   deleteAllVoterDialogVisible.value = false;
+//   voterCountRefresh();
+//   if (error.value) {
+//     ElMessage.error("刪除失敗" + errHandle(error));
+//   } else {
+//     ElMessage.success("刪除成功");
+//   }
+// };
 
-const deleteVoterData = async () => {
-  const { error } = await useFetch("/api/voter/del", {
-    method: "DELETE",
-    query: { id: queryInputData.value },
-  });
-  queryInput.value = "";
-  studentIdStatus.value = studentIdStatusEnum.noInput;
-  voterCountRefresh();
+// const deleteVoterData = async () => {
+//   const { error } = await useFetch("/api/voter/del", {
+//     method: "DELETE",
+//     query: { id: queryInputData.value },
+//   });
+//   queryInput.value = "";
+//   studentIdStatus.value = studentIdStatusEnum.noInput;
+//   voterCountRefresh();
 
-  if (error.value) {
-    ElMessage.error("刪除失敗" + errHandle(error));
-  } else {
-    ElMessage.success("刪除成功");
-  }
-};
+//   if (error.value) {
+//     ElMessage.error("刪除失敗" + errHandle(error));
+//   } else {
+//     ElMessage.success("刪除成功");
+//   }
+// };
 
 const uploadSubmit = async () => {
   submitUpload();
 };
 
-const addNewVoter = async () => {
-  const addNewStudentId = queryInputData.value;
-  const addNewDepartment = departmentInput.value;
-  const { error } = await useFetch("/api/voter/add", {
-    method: "PUT",
-    query: {
-      id: addNewStudentId,
-      department: addNewDepartment,
-    },
-  });
-  if (error.value) {
-    ElMessage.error("新增失敗" + errHandle(error));
-  } else {
-    ElMessage.success("新增成功");
-  }
-  refreshVoterData();
-};
+// const addNewVoter = async () => {
+//   const addNewStudentId = queryInputData.value;
+//   const addNewDepartment = departmentInput.value;
+//   const { error } = await useFetch("/api/voter/add", {
+//     method: "PUT",
+//     query: {
+//       id: addNewStudentId,
+//       department: addNewDepartment,
+//     },
+//   });
+//   if (error.value) {
+//     ElMessage.error("新增失敗" + errHandle(error));
+//   } else {
+//     ElMessage.success("新增成功");
+//   }
+//   refreshVoterData();
+// };
 
-interface Department {
-  id: number;
-  name: string;
-}
+// interface Department {
+//   id: number;
+//   name: string;
+// }
 
-const departmentList = ref<Department[]>([]);
+// const departmentList = ref<Department[]>([]);
 
-const queryAllDepartment = (
-  queryString: string,
-  cb: (results: { id: number; name: string }[]) => void,
-) => {
-  const results = queryString
-    ? departmentList.value.filter(createFilter(queryString))
-    : departmentList.value;
-  cb(results);
-};
+// const queryAllDepartment = (
+//   queryString: string,
+//   cb: (results: { id: number; name: string }[]) => void,
+// ) => {
+//   const results = queryString
+//     ? departmentList.value.filter(createFilter(queryString))
+//     : departmentList.value;
+//   cb(results);
+// };
 
-const createFilter = (queryString: string) => {
-  return (department: Department) => {
-    return department.name.indexOf(queryString) === 0;
-  };
-};
+// const createFilter = (queryString: string) => {
+//   return (department: Department) => {
+//     return department.name.indexOf(queryString) === 0;
+//   };
+// };
 
-onMounted(async () => {
-  departmentList.value = await loadAll();
-});
+// onMounted(async () => {
+//   departmentList.value = await loadAll();
+// });
 
-const loadAll = async () => {
-  const { data: departments, error } = await useFetch("/api/department/getAll");
-  if (error.value) {
-    ElMessage.error("獲取系所列表失敗" + errHandle(error));
-  }
-  return departments.value!;
-};
+// const loadAll = async () => {
+//   const { data: departments, error } = await useFetch("/api/department/getAll");
+//   if (error.value) {
+//     ElMessage.error("獲取系所列表失敗" + errHandle(error));
+//   }
+//   return departments.value!;
+// };
 </script>

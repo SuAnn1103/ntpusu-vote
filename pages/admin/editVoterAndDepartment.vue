@@ -19,10 +19,13 @@
     </div>
     <div class="content">
       <template v-if="currentPage === 'editDepartment'">
-        <editDepatment />
+        <editDepartment />
       </template>
       <template v-else-if="currentPage === 'editVoter'">
         <editVoter />
+      </template>
+      <template v-else-if="currentPage === 'deleteAndEdit'">
+        <deleteAndEdit @data-deleted="handleDataDeleted" />
       </template>
     </div>
     <div>
@@ -30,52 +33,71 @@
         class="my-5 ml-3"
         :style="{ display: currentStep === 0 ? 'none' : '' }"
         @click="prevStep"
-        >上一步</el-button
       >
+        上一步
+      </el-button>
       <el-button
-        class="my-5 mr-3"
-        :style="{ display: currentStep === 0 ? '' : 'none' }"
-        @click="nextStep"
-        >下一步</el-button
+      :disabled="isNextDisabled"
+      :style="{ display: currentStep === 0 ? '' : 'none' }"
+      @click="nextStep"
       >
+      下一步
+      </el-button>
       <el-button
-        class="my-5 mr-3"
-        :style="{ display: currentStep === steps.length - 2 ? '' : 'none' }"
-        @click="nextStep"
-        >完成</el-button
+      :disabled="isNextDisabled"
+      class="my-5 mr-3"
+      :style="{ display: currentStep === steps.length - 2 ? '' : 'none' }"
+      @click="nextStep"
       >
+        完成
+      </el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import editDepatment from "~/pages/admin/editDepartment.vue";
+import { ref } from "vue";
+import editDepartment from "~/pages/admin/editDepartment.vue";
 import editVoter from "~/pages/admin/editVoter.vue";
+import deleteAndEdit from "~/pages/admin/deleteAndEdit.vue";
 
 const currentStep = ref(0);
-const steps = ["editDepartment", "editVoter", "editFile"];
+const steps = ["editDepartment", "editVoter", "deleteAndEdit"];
 const currentPage = ref("editDepartment");
 
-watch(currentStep, (newStep) => {
-  if (newStep === 0) {
-    currentPage.value = "editDepartment";
-  } else if (newStep === 1) {
-    currentPage.value = "editVoter";
-  } else if (newStep === 2) {
-    currentPage.value = "editFile";
+const electorCounter = useState('electorCounter', () => 0);
+const voterCounter = useState('voterCounter', () => 0);
+
+const isNextDisabled = computed(() => {
+  if(currentStep.value === 0){
+    return electorCounter.value === 0 
   }
-});
+  else if(currentStep.value === 1){
+    return voterCounter.value === 0;
+  }
+  return false;
+})
 
 const prevStep = () => {
   if (currentStep.value > 0) {
     currentStep.value--;
+    currentPage.value = steps[currentStep.value];
   }
 };
 
-const nextStep = () => {
-  if (currentStep.value < steps.length - 1) {
-    currentStep.value++;
+const nextStep = async () => {
+  if (currentStep.value === 0) {
+    currentStep.value = 1;
+    currentPage.value = "editVoter";
   }
+  else if (currentStep.value === 1) {
+    currentStep.value = 2;
+    currentPage.value = "deleteAndEdit";
+  }
+};
+
+const handleDataDeleted = () => {
+  currentStep.value = 0;
+  currentPage.value = "editDepartment";
 };
 </script>

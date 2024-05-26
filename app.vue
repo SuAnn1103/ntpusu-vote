@@ -558,6 +558,14 @@ const getAdminMenuItems = () => {
           useRouter().push("/admin/editDepartment");
         },
       },
+      {
+        index: "/admin/deleteAndEdit",
+        text: "刪除和修改",
+        click: () => {
+          show.value = false;
+          useRouter().push("/admin/deleteAndEdit");
+        },
+      },
     ];
 
     if (superAdmin.value) {

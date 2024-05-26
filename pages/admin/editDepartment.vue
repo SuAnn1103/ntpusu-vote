@@ -42,6 +42,7 @@
       </ElCollapseItem>
     </ElCollapse>
     <!-- 檔案上傳元件 -->
+    <!-- <ElButton id="uploadFile" type="primary" @click="dialogVisible = true">選擇檔案</ElButton> -->
     <ElUpload
       v-if="electorCount == 0"
       ref="uploadRef"
@@ -51,10 +52,11 @@
       :drag="true"
       :auto-upload="false"
       :limit="1"
-    >
+      >
+      <!-- style="display:none" -->
       <!-- 上傳按鈕 -->
       <template #trigger>
-        <ElButton id="uploadFile" type="primary">選擇檔案</ElButton>
+        <ElButton id="uploadFile" type="primary" @click="dialogVisible = true">選擇檔案</ElButton>
       </template>
       <!-- 提交按鈕 -->
       <ElButton
@@ -107,13 +109,13 @@
       />
     </div> -->
     <!-- 顯示目前系統內的資料筆數 -->
-    <!-- <ElText
+    <ElText
       v-if="!uploadDialogVisible && !deletingDialogVisible"
       class="mx-1"
       size="large"
       >目前系統內有{{ electorCount }}筆資料</ElText
     >
-    <br> -->
+    <br>
     <!-- 刪除選區 -->
     <!-- <ElButton
       v-if="electorCount != 0"
@@ -156,11 +158,11 @@ definePageMeta({
 //   Found,
 // }
 
+const dialogVisible = ref(false);
 const open = ref(false);
 
-
 const uploadDialogVisible = ref(false);
-// const deletingDialogVisible = ref(false);
+const deletingDialogVisible = ref(false);
 // const queryInput = ref("");
 // const departmentIdStatus = ref(studentIdStatusEnum.noInput);
 const selectUploadMode = ref("");
@@ -172,9 +174,18 @@ const uploadRef = ref<UploadInstance>();
 const submitUpload = () => {
   uploadRef.value!.submit();
 };
+
+const electorCounter = useState('electorCounter', () => 0);
+
 const { data: electorCount, refresh: electorCountRefresh } = await useFetch(
   "/api/department/getCnt",
 );
+
+watchEffect(() => {
+  if (electorCount.value !== null && electorCount.value !== 0) {
+    electorCounter.value = electorCount.value;
+  }
+});
 
 const { data: departmentDetail, refresh: electorDetailRefresh } =
   await useFetch("/api/department/getAllWithGroupName");
