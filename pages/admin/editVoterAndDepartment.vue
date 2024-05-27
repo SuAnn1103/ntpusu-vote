@@ -28,26 +28,27 @@
         <deleteAndEdit @data-deleted="handleDataDeleted" />
       </template>
     </div>
-    <div>
-      <el-button
-        class="my-5 ml-3"
+    <div class="text-right my-5" >
+      <!-- <el-button
+        class="my-5"
         :style="{ display: currentStep === 0 ? 'none' : '' }"
         @click="prevStep"
       >
         上一步
-      </el-button>
+      </el-button> -->
       <el-button
-      :disabled="isNextDisabled"
-      :style="{ display: currentStep === 0 ? '' : 'none' }"
-      @click="nextStep"
+        :disabled="isNextDisabled"
+        class="my-5"
+        :style="{ display: currentStep === 0 ? '' : 'none' }"
+        @click="nextStep"
       >
-      下一步
+        下一步
       </el-button>
       <el-button
-      :disabled="isNextDisabled"
-      class="my-5 mr-3"
-      :style="{ display: currentStep === steps.length - 2 ? '' : 'none' }"
-      @click="nextStep"
+        :disabled="isNextDisabled"
+        class="my-5"
+        :style="{ display: currentStep === steps.length - 2 ? '' : 'none' }"
+        @click="nextStep"
       >
         完成
       </el-button>
@@ -65,32 +66,31 @@ const currentStep = ref(0);
 const steps = ["editDepartment", "editVoter", "deleteAndEdit"];
 const currentPage = ref("editDepartment");
 
-const electorCounter = useState('electorCounter', () => 0);
-const voterCounter = useState('voterCounter', () => 0);
+const electorCounter = useState("electorCounter", () => 0);
+const voterCounter = useState("voterCounter", () => 0);
 
 const isNextDisabled = computed(() => {
-  if(currentStep.value === 0){
-    return electorCounter.value === 0 
-  }
-  else if(currentStep.value === 1){
+  if (currentStep.value === 0) {
+    console.log("electorCounter:"+electorCounter.value);
+    return electorCounter.value === 0;
+  } else if (currentStep.value === 1) {
     return voterCounter.value === 0;
   }
   return false;
-})
+});
 
-const prevStep = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--;
-    currentPage.value = steps[currentStep.value];
-  }
-};
+// const prevStep = () => {
+//   if (currentStep.value > 0) {
+//     currentStep.value--;
+//     currentPage.value = steps[currentStep.value];
+//   }
+// };
 
 const nextStep = async () => {
   if (currentStep.value === 0) {
     currentStep.value = 1;
     currentPage.value = "editVoter";
-  }
-  else if (currentStep.value === 1) {
+  } else if (currentStep.value === 1) {
     currentStep.value = 2;
     currentPage.value = "deleteAndEdit";
   }

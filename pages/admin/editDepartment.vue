@@ -1,12 +1,13 @@
 <template>
   <div class="flex flex-col items-center">
     <div class="relative">
-      <h1 class="my-5 text-2xl font-bold inline-block">管理選舉區</h1>
-      <el-button 
+      <h1 class="my-5 inline-block text-2xl font-bold">管理選舉區</h1>
+      <el-button
         round
-        class="ml-5 md:ml-10 absolute top-1/2 transform -translate-y-1/2"
+        class="absolute top-1/2 ml-5 -translate-y-1/2 transform md:ml-10"
         @click="open = true"
-      >使用說明</el-button>
+        >使用說明</el-button
+      >
     </div>
     <ElCollapse
       v-model="activeNames"
@@ -52,11 +53,16 @@
       :drag="true"
       :auto-upload="false"
       :limit="1"
-      >
+    >
       <!-- style="display:none" -->
       <!-- 上傳按鈕 -->
       <template #trigger>
-        <ElButton id="uploadFile" type="primary" @click="dialogVisible = true">選擇檔案</ElButton>
+        <ElButton
+          id="uploadFile"
+          type="primary"
+          @click="dialogVisible = true"
+          >選擇檔案</ElButton
+        >
       </template>
       <!-- 提交按鈕 -->
       <ElButton
@@ -91,15 +97,15 @@
       />
     </div>
     <!-- 刪除選區 -->
-    <!-- <div class="demo-progress">
+    <div class="demo-progress">
       <ElText
         v-if="deletingDialogVisible"
         class="mx-1"
         size="large"
         >刪除中...</ElText
-      > -->
+      >
       <!-- 顯示刪除進度條 -->
-      <!-- <ElProgress
+      <ElProgress
         v-if="deletingDialogVisible"
         class="mt-3 w-2/3"
         :percentage="100"
@@ -107,7 +113,7 @@
         :indeterminate="true"
         :duration="1"
       />
-    </div> -->
+    </div>
     <!-- 顯示目前系統內的資料筆數 -->
     <ElText
       v-if="!uploadDialogVisible && !deletingDialogVisible"
@@ -117,27 +123,33 @@
     >
     <br>
     <!-- 刪除選區 -->
-    <!-- <ElButton
+    <ElButton
       v-if="electorCount != 0"
       id="deleteAllDepartments"
       type="danger"
       @click="deleteGroupData"
       >刪除所有選區</ElButton
     >
-    <br> -->
-    <el-tour
-      v-model="open"
-    >
-    <el-tour-step
-      :target="'#uploadFile'"
-      title="Upload File"
-      description="Put you files here."
-    />
-    <el-tour-step
-      :target="'#uploadtoServer'"
-      title="Save"
-      description="Save your changes"
-    />
+    <br>
+    <el-tour v-model="open">
+      <el-tour-step
+        v-if="electorCount == 0"
+        :target="'#uploadFile'"
+        title="上傳投票區清單"
+        description="請選擇欲上傳之xlsx檔"
+      />
+      <el-tour-step
+        v-if="electorCount == 0"
+        :target="'#uploadtoServer'"
+        title="確認上傳"
+        description="將選擇之xlsx檔上傳至伺服器，按下才是正式上傳檔案"
+      />
+      <el-tour-step
+        v-if="electorCount != 0"
+        :target="'#deleteAllDepartments'"
+        title="刪除上傳選舉區清單"
+        description="當您想更動原上傳檔案時，可刪除並重新上傳，如無需更動則請按下一步"
+      />
       <template #indicators="{ current, total }">
         <span>{{ current + 1 }} / {{ total }}</span>
       </template>
@@ -152,19 +164,23 @@ definePageMeta({
   title: "管理選舉區",
 });
 
-// enum studentIdStatusEnum {
-//   noInput,
-//   notFound,
-//   Found,
-// }
+//delete
+enum studentIdStatusEnum {
+  noInput,
+  notFound,
+  Found,
+}
 
 const dialogVisible = ref(false);
 const open = ref(false);
 
 const uploadDialogVisible = ref(false);
 const deletingDialogVisible = ref(false);
-// const queryInput = ref("");
-// const departmentIdStatus = ref(studentIdStatusEnum.noInput);
+
+//delete
+const queryInput = ref("");
+const departmentIdStatus = ref(studentIdStatusEnum.noInput);
+
 const selectUploadMode = ref("");
 
 const activeNames = ref(["1"]);
@@ -175,17 +191,34 @@ const submitUpload = () => {
   uploadRef.value!.submit();
 };
 
-const electorCounter = useState('electorCounter', () => 0);
+const electorCounter = useState("electorCounter", () => 0);
 
 const { data: electorCount, refresh: electorCountRefresh } = await useFetch(
   "/api/department/getCnt",
 );
 
 watchEffect(() => {
-  if (electorCount.value !== null && electorCount.value !== 0) {
-    electorCounter.value = electorCount.value;
-  }
+  if (electorCount.value !== null) {
+    electorCounter.value = electorCount.value;   
+    console.log(electorCounter.value, electorCount.value);
+    // open.value = true;
+  } 
+  // else {
+  //   open.value = false;
+  // }
 });
+
+// onMounted(() => {
+//   if (electorCount.value !== null) {
+//     console.log(electorCounter.value, electorCount.value);
+//     nextTick(() => {
+//       open.value = true;
+//     });
+//   } else {
+//     open.value = false;
+//   }
+// }
+// );
 
 const { data: departmentDetail, refresh: electorDetailRefresh } =
   await useFetch("/api/department/getAllWithGroupName");
@@ -220,6 +253,7 @@ const uploadFunc = async (item: { file: File }) => {
   uploadRef.value!.clearFiles();
 };
 
+//delete
 const deleteGroupData = async () => {
   ElMessageBox.confirm("確定要刪除所有選區嗎？", "刪除選區", {
     confirmButtonText: "刪除",
@@ -243,13 +277,13 @@ const deleteGroupData = async () => {
           ElMessage.error("刪除失敗");
         });
 
-//       deletingDialogVisible.value = false;
-//     })
-//     .catch(() => {
-//       ElMessage({
-//         type: "info",
-//         message: "取消刪除",
-//       });
-//     });
-// };
+      deletingDialogVisible.value = false;
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "取消刪除",
+      });
+    });
+};
 </script>

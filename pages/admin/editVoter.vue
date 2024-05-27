@@ -1,22 +1,25 @@
 <template>
   <div style="text-align: -webkit-center">
-    <div class="flex justify-center items-center">
-    <div class="relative">
-      <h1 class="my-5 text-2xl font-bold inline-block">管理投票者</h1>
-      <el-button 
-        round
-        class="ml-5 md:ml-10 absolute top-1/2 transform -translate-y-1/2"
-        @click="open = true"
-      >使用說明</el-button>
+    <div class="flex items-center justify-center">
+      <div class="relative">
+        <h1 class="my-5 inline-block text-2xl font-bold">管理投票者</h1>
+        <el-button
+          round
+          class="absolute top-1/2 ml-5 -translate-y-1/2 transform md:ml-10"
+          @click="open = true"
+          >使用說明</el-button
+        >
+      </div>
     </div>
-  </div>
     <ElText
+      v-if="voterCount == 0"
       class="mx-1"
       size="large"
       >上傳投票者名單</ElText
     >
     <div class="mx-30">
       <ElUpload
+        v-if="voterCount == 0"
         ref="uploadRef"
         action="none"
         accept=".xlsx"
@@ -26,22 +29,25 @@
         :limit="1"
       >
         <template #trigger>
-          <ElButton id="uploadFile" type="primary">選擇檔案</ElButton>
+          <ElButton
+            id="uploadFile"
+            type="primary"
+            >選擇檔案</ElButton
+          >
         </template>
         <ElButton
-        id="uploadtoServer"
-        class="ml-3"
-        type="success"
-        @click="uploadSubmit"
+          id="uploadtoServer"
+          class="ml-3"
+          type="success"
+          @click="uploadSubmit"
         >
-        上傳至伺服器端
-      </ElButton>
-      
-      <template #tip>
-        <div class="el-upload__tip">僅能上傳 .xlsx 文件</div>
-      </template>
-    </ElUpload>
-      
+          上傳至伺服器端
+        </ElButton>
+
+        <template #tip>
+          <div class="el-upload__tip">僅能上傳 .xlsx 文件</div>
+        </template>
+      </ElUpload>
     </div>
     <ElText
       class="mx-1"
@@ -50,7 +56,8 @@
     >
     <br>
     <br>
-    <!-- <ElButton
+    <ElButton
+      v-if="voterCount != 0"
       id="deleteAllVoters"
       type="danger"
       round
@@ -79,7 +86,7 @@
     </ElDialog>
     <br>
     <br>
-    <ElButton
+    <!-- <ElButton
       id="changeData"
       plain
       @click="dataChangeDialogVisible = true"
@@ -183,29 +190,30 @@
         </div>
       </template>
     </ElDialog> -->
-    <el-tour
-      v-model="open"
-    >
-    <el-tour-step
-      :target="'#uploadFile'"
-      title="Upload File"
-      description="Put you files here."
-    />
-    <el-tour-step
-      :target="'#uploadtoServer'"
-      title="Save"
-      description="Save your changes"
-    />
-    <el-tour-step
-      :target="'#deleteAllVoters'"
-      title="Other Actions"
-      description="Click to see other"
-    />
-    <el-tour-step
+    <el-tour v-model="open">
+      <el-tour-step
+        v-if="voterCount == 0"
+        :target="'#uploadFile'"
+        title="上傳投票人名冊"
+        description="請選擇欲上傳檔案，請注意須為xlsx檔"
+      />
+      <el-tour-step
+        v-if="voterCount == 0"
+        :target="'#uploadtoServer'"
+        title="確認上傳"
+        description="將選擇之xlsx檔上傳至伺服器，按下才是正式上傳檔案"
+      />
+      <el-tour-step
+        v-if="voterCount != 0"
+        :target="'#deleteAllVoters'"
+        title="刪除上傳之選舉人名冊"
+        description="當您想更動原上傳檔案時，可刪除並重新上傳，如無需更動則請按下一步"
+      />
+      <!-- <el-tour-step
       :target="'#changeData'"
       title="Other Actions"
       description="Click to see other"
-    />
+    /> -->
       <template #indicators="{ current, total }">
         <span>{{ current + 1 }} / {{ total }}</span>
       </template>
@@ -216,7 +224,7 @@
 <script setup lang="ts">
 import type { UploadInstance } from "element-plus";
 //import { Search } from "@element-plus/icons-vue";
-// import 'element-plus/theme-chalk/el-tour.css'; 
+// import 'element-plus/theme-chalk/el-tour.css';
 // import { ElTour } from 'element-plus';
 
 definePageMeta({
@@ -225,7 +233,7 @@ definePageMeta({
 });
 
 // const dataChangeDialogVisible = ref(false);
-// const deleteAllVoterDialogVisible = ref(false);
+const deleteAllVoterDialogVisible = ref(false);
 // const queryInput = ref("");
 // const departmentInput = ref("");
 // const queryInputData = ref("");
@@ -266,15 +274,21 @@ const errHandle = (err: any) => {
   }
 };
 
-const voterCounter = useState('voterCounter', () => 0);
+const voterCounter = useState("voterCounter", () => 0);
 
 const { data: voterCount, refresh: voterCountRefresh } =
   await useFetch("/api/voter/getCnt");
 
- watchEffect(() => {
-  if (voterCount.value !== null && voterCount.value !== 0) {
+watchEffect(() => {
+  if (voterCount.value !== null) {
     voterCounter.value = voterCount.value;
-  }
+    // nextTick(() => {
+    //   open.value = true;
+    // });
+  } 
+  // else {
+  //   open.value = false;
+  // }
 });
 
 const uploadFunc = async (item: { file: File }) => {
@@ -388,18 +402,18 @@ const uploadFunc = async (item: { file: File }) => {
 //   refreshVoterData();
 // };
 
-// const deleteAllVoter = async () => {
-//   const { error } = await useFetch("/api/voter/delAll", {
-//     method: "DELETE",
-//   });
-//   deleteAllVoterDialogVisible.value = false;
-//   voterCountRefresh();
-//   if (error.value) {
-//     ElMessage.error("刪除失敗" + errHandle(error));
-//   } else {
-//     ElMessage.success("刪除成功");
-//   }
-// };
+const deleteAllVoter = async () => {
+  const { error } = await useFetch("/api/voter/delAll", {
+    method: "DELETE",
+  });
+  deleteAllVoterDialogVisible.value = false;
+  voterCountRefresh();
+  if (error.value) {
+    ElMessage.error("刪除失敗" + errHandle(error));
+  } else {
+    ElMessage.success("刪除成功");
+  }
+};
 
 // const deleteVoterData = async () => {
 //   const { error } = await useFetch("/api/voter/del", {

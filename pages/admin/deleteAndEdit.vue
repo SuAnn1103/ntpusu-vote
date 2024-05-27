@@ -1,6 +1,14 @@
 <template>
-  <div class="text-center">
-    <h1 class="my-5 text-2xl font-bold">管理投票者和選區資料</h1>
+  <div class="flex flex-col items-center">
+    <div class="relative">
+      <h1 class="my-5 inline-block text-2xl font-bold">管理投票者和選區資料</h1>
+      <el-button
+        round
+        class="absolute top-1/2 ml-5 -translate-y-1/2 transform md:ml-10"
+        @click="open = true"
+        >使用說明</el-button
+      >
+   </div>
     <ElButton
       id="deleteAllData"
       type="danger"
@@ -18,7 +26,11 @@
       <span>刪除後將無法復原</span>
       <template #footer>
         <div class="dialog-footer">
-          <ElButton @click="deleteAllDataDialogVisible = false">取消</ElButton>
+          <ElButton 
+            @click="deleteAllDataDialogVisible = false"
+          >
+            取消
+          </ElButton>
           <ElButton
             type="danger"
             @click="deleteAllData"
@@ -29,7 +41,8 @@
       </template>
     </ElDialog>
     <br>
-    <br>
+    <br
+    >
     <ElButton
       id="editIndividualData"
       plain
@@ -54,13 +67,15 @@
           :icon="Search"
           size="large"
           @click="queryStudentData"
-        >查詢</ElButton>
+          >查詢</ElButton
+        >
         <br><br>
         <template v-if="queryInputData !== ''">
           <ElText
             class="mx-1"
             type="info"
-          >當前為學號{{ queryInputData }}的資料</ElText>
+            >當前為學號{{ queryInputData }}的資料</ElText
+          >
         </template>
         <br><br>
         <template v-if="studentIdStatus == studentIdStatusEnum.notFound">
@@ -116,7 +131,8 @@
           <ElButton
             type="danger"
             @click="deleteVoterData"
-          >刪除此投票者資料</ElButton>
+            >刪除此投票者資料</ElButton
+          >
         </template>
       </div>
       <template #footer>
@@ -130,16 +146,28 @@
         </div>
       </template>
     </ElDialog>
+    <el-tour v-model="open">
+      <el-tour-step
+        :target="'#deleteAllData'"
+        title="刪除所有資料"
+        description="將選舉區、投票人資料全部清空，並回到step1重新上傳"
+      />
+      <el-tour-step
+        :target="'#editIndividualData'"
+        title="個別更動選舉人資料"
+        description="可透過搜尋學號，更動個別選舉人之資料"
+      />
+    </el-tour>
   </div>
 </template>
 
 <script setup lang="ts">
-
-import { ref } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ref } from "vue";
+import { ElMessage } from "element-plus";
 // import { useFetch } from '@nuxtjs/composition-api';
 import { Search } from "@element-plus/icons-vue";
 
+const open = ref(false);
 const deleteAllDataDialogVisible = ref(false);
 const editDataDialogVisible = ref(false);
 const queryInput = ref("");
@@ -159,11 +187,14 @@ const voterData = ref<{
   department: string;
 } | null>(null);
 
-const emit = defineEmits(['data-deleted']);
+const emit = defineEmits(["data-deleted"]);
 
 const queryStudentData = async () => {
   queryInputData.value = queryInput.value;
-  const { data: res, error } = await useFetch<{ id: number; department: string }>("/api/voter/getVoterAndDepartment", {
+  const { data: res, error } = await useFetch<{
+    id: number;
+    department: string;
+  }>("/api/voter/getVoterAndDepartment", {
     query: { voter: parseInt(queryInput.value) },
   });
   if (error.value) {
@@ -237,7 +268,7 @@ const deleteAllData = async () => {
     ElMessage.error("刪除失敗");
   } else {
     ElMessage.success("刪除成功");
-    emit('data-deleted');
+    emit("data-deleted");
   }
 };
 
@@ -283,6 +314,4 @@ const loadAll = async () => {
   }
   return departments.value!;
 };
-
 </script>
-
